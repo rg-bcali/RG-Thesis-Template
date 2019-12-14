@@ -6,6 +6,7 @@ DVI_VIEW = xdvi
 PS_VIEW = gv
 PS2PDF = ps2pdf
 NAME = thesis
+PDF_NAME = qiikoo-thesis
 TEXHTML = latex2html
 CC = clang
 
@@ -16,7 +17,7 @@ ps_view: ps
 
 pdf: dvi
 	$(LATEX) $(NAME).tex
-	$(DVIPDF) $(NAME)
+	$(DVIPDF) $(PDF_NAME)
 
 ps2pdf: ps
 	$(PS2PDF) $(NAME).ps
