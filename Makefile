@@ -17,7 +17,7 @@ ps_view: ps
 
 pdf: dvi
 	$(LATEX) $(NAME).tex
-	$(DVIPDF) $(PDF_NAME)
+	$(DVIPDF) $(NAME)
 
 ps2pdf: ps
 	$(PS2PDF) $(NAME).ps
