@@ -25,7 +25,7 @@
 \end{table}
 
 \subsection{ネットワーク構成}
-\label{implementation:environment:network}
+\label{implementation:network-environment}
 本研究では、esxiの仮想スイッチと仮想Vlanを利用して二つのesxiサーバ上に論理的に隔離されたセグメントを構築した。
 
 まず、10.4.0.0/16のセグメントに二台のesxiサーバをマウントし、ひとつを10.4.0.13/16、もうひとつを10.4.0.14/16とした。（← eth0等の説明をいれる）
@@ -36,14 +36,15 @@
 し、OpenVPNサーバへ接続することで、10.23.0.0/24セグメント上で疎通可能な環境を構築した。
 
 \subsection{Kubernetesクラスタ構成}
-\label{implementation:environment:kubernetes}
+\label{implementation:kubernetes-environment}
 本研究で構築したKubernetesクラスタは、クラスタを操作するマスターノード三台、コンテナ型アプリケーションを配置するワーカーノード六台によって構成される。
 今回は、異なるセグメントに配置したマスターノードとワーカーノードでクラスタリングを行うことで、ネットワーク上で論理的に離れた環境下のステージング環境が
 構築可能であることを示した。
 
-~\ref{implementation:environment:network}で示したネットワーク構成とKubernetesクラスタ構成をまとめた表を以下に示す。
+~\ref{implementation:network-environment}で示したネットワーク構成とKubernetesクラスタ構成をまとめた表を以下に示す。
 
 \section{システム全体}
+\label{implementation:system}
 本研究で構築した実装環境の図を以下に示す。
 
 \begin{figure}[htbp]
