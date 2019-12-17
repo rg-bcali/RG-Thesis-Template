@@ -111,6 +111,7 @@ P2Pシステムの利点としては、拡張性（スケーラビリティ）�
 
 \section{Docker}
 \label{background:docker}
+
 Docker~\cite{Docker}はコンテナ型仮想環境を実現するためのプラットフォームおよびツールである。
 VirtualBoxなどのハイバーバイザー型の仮想マシンとは異なり、コンテナはホストマシンのカーネルをプロセスやユーザ毎に隔離することで、
 仮想的に別のマシンを動かしているようにみせることができる。
@@ -122,6 +123,7 @@ Dockerではコンテナイメージをもとにコンテナを実行する。
 
 \section{Kubernetes}
 \label{background:kubernetes}
+
 Kubernetes~\cite{Kubernetes}はコンテナオーケストレーションエンジンであり、コンテナ化されたアプリケーションのデプロイやスケーリングなどの管理を
 自動化するためのプラットフォームである。
 もともとGoogle社内で利用されていたコンテナクラスタマネージャの「Borg」を基盤にして作られたオープンソースソフトウェアだ。
@@ -133,6 +135,11 @@ Infrastructure as Codeが実現可能としている。
 
 \section{OpenVPN}
 \label{background:openvpn}
+
+OpenVPN~\cite{OpenVPN}はOpenVPN Technologies, inc.を中心に開発が行われているオープンソースのVirtual Private Networkソフトウェアである。
+OpenVPNはWindowsやLinux、Mac OS、iOS, Androidでも利用でき、幅広いOS上で動作可能だ。
+認証方法も豊富であり、静的鍵による認証や証明書認証、ID/パスワード認証、二要素認証をサポートしている。
+VPNに関しても、マルチクライアントVPNに加えサイト間VPNの設定が可能であり、用途によって使い分けることができる。
 
 \if0
 \begin{figure}[h]
