@@ -2,9 +2,30 @@
 \label{evaluation}
 本章では，提案システムの評価について述べる．
 
-\section{評価内容}
-\label{evaluation:contents}
+\section{評価手法}
+\label{evaluation:method}
 
+basafaネットワークに参加する28の大学すべてで、新バージョンのbitcoindを起動させるケースにおいて、従来の工程と本研究で
+提案したシステムを使用した場合の工程を比較する。
+
+\section{評価内容}
+\label{evaluation:content}
+
+\subsection{従来の工程}
+
+・各大学への連絡（GitHubレポジトリ及びブランチやバージョンの共有、作業日程調整）×28
+・各種コマンドの実行
+```
+```
+・完了報告
+
+\subsection{本研究で提案したシステムでの工程}
+
+・Kubernetesのマニフェストファイルを更新する
+・以下のコマンドでKubernetesクラスタへのコンテナのデプロイを行う
+`kubectl`
+・以下のコマンドで対象のコンテナが起動することを確認する
+`kubectl get pods -o wide`
 
 %%% Local Variables:
 %%% mode: japanese-latex
