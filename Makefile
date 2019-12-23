@@ -5,8 +5,7 @@ DVIPDF = dvipdfmx
 DVI_VIEW = xdvi
 PS_VIEW = gv
 PS2PDF = ps2pdf
-NAME = thesis
-PDF_NAME = qiikoo-thesis
+NAME = qiikoo_thesis
 TEXHTML = latex2html
 CC = clang
 
