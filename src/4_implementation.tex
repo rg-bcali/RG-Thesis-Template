@@ -12,16 +12,19 @@
 本研究で使用したハードウェアおよびソフトウェアとそのバージョンを以下に示す．
 
 \begin{table}[htb]
-  \begin{tabular}{lc}
-    ハードウェア/ソフトウェア & バージョン \\
-    ESXi & 6.5 \\
-    VyOS & 1.2.1 \\
-    OpenVPN & ?? \\
-    Fujitsu Server & 2600ほげ \\
-    kubeadm & 1.16.4 \\
-    kubelet & 1.16.4 \\
-    kubectl & 1.16.4 \\
-  \end{tabular}
+  \begin{center}
+    \caption{使用したハードウェアおよびソフトウェア}
+    \begin{tabular}{|l|l|} \hline
+      ハードウェア/ソフトウェア & バージョン \\ \hline
+      ESXi & 6.5 \\ \hline
+      VyOS & 1.2.1 \\ \hline
+      OpenVPN & ?? \\ \hline
+      Fujitsu Server & 2600ほげ \\ \hline
+      kubeadm & 1.16.4 \\ \hline
+      kubelet & 1.16.4 \\ \hline
+      kubectl & 1.16.4 \\ \hline
+    \end{tabular}
+  \end{center}
 \end{table}
 
 \subsection{ネットワーク構成}
@@ -34,6 +37,38 @@
 なセグメント間でのKubernetesクラスタの構築はできないため，OpenVPNを用いてセグメント間での疎通を可能にする．eth0が10.4.0.90，eth1が192.168.10.1
 のアドレスを振り分けたVyosにOpenVPNサーバを構築した．異なるVLanセグメントに位置するノードには，OpenVPNで発行したクライアント鍵と設定ファイルを配布
 し，OpenVPNサーバへ接続することで，10.23.0.0/24セグメント上で疎通可能な環境を構築した．
+
+\begin{table}[htb]
+  \begin{center}
+    \caption{OpenVPN設定前の各サーバのIPアドレス}
+    \begin{tabular}{|l|l|} \hline
+      名前 & IPアドレス \\ \hline
+      Master01 & 192.168.10.101 \\ \hline
+      Master02 & 192.168.10.102 \\ \hline
+      Master03 & 192.168.10.103 \\ \hline
+      Worker01 & 192.168.20.101 \\ \hline
+      Worker02 & 192.168.20.102 \\ \hline
+      Worker03 & 192.168.30.101 \\ \hline
+      Worker04 & 192.168.30.102 \\ \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\begin{table}[htb]
+  \begin{center}
+    \caption{OpenVPN設定前の各サーバの疎通性}
+    \begin{tabular}{|c|c|c|c|c|c|c|c|} \hline
+      & Master01 & Master02 & Master03 & Worker01 & Worker02 & Worker03 & Worker04 \\ \hline
+      Master01 & \ & ○ & ○ & × & × & × & × \\ \hline
+      Master02 & ○ & \ & ○ & × & × & × & × \\ \hline
+      Master03 & ○ & ○ & \ & × & × & × & × \\ \hline
+      Worker01 & × & × & × & \ & ○ & × & × \\ \hline
+      Worker02 & × & × & × & ○ & \ & × & × \\ \hline
+      Worker03 & × & × & × & × & × & \ & ○ \\ \hline
+      Worker04 & × & × & × & × & × & ○ & \ \\ \hline
+    \end{tabular}
+  \end{center}
+\end{table}
 
 \subsection{Kubernetesクラスタ構成}
 \label{implementation:kubernetes-environment}
