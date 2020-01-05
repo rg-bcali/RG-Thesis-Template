@@ -54,8 +54,32 @@
 
 \begin{enumerate}
   \item 特定のノードからステージング環境に属する全てのノードに対して一斉に指示を送ることができるか
-  \item 本研究での提案手法を用いず従来の手作業を含む手法を選んだ場合、工数にどのような差が生じるか
+  \item 本研究の提案手法を用いず従来の手作業を含む手法を選んだ場合、工数にどのような差が生じるか
 \end{enumerate}
+
+一点目は、kubectlコマンドを用いてステージング環境のワーカーノードに対して同時にアプリケーションをデプロイすることができたかを確認した。\\*
+
+\begin{lstlisting}[language=bash]
+  $ kubectl create deployment --image nginx hello-world
+  $ kubectl get pods -owide
+  NAME                          READY   STATUS    RESTARTS   AGE    IP          NODE       NOMINATED NODE   READINESS GATES
+  hello-world-7c5756786-gx5hk   1/1     Running   0          3d6h   10.44.0.1   master02   <none>           <none>
+\end{lstlisting}
+
+二点目は、まず従来の手法を用いた場合の作業工程を列挙し、提案手法との違いを定性的に評価した。
+ここでは複数の大学によって構成される研究ネットワークにて、新たに開発した地理的に分散したシステムのためのステージング環境を構築・運用するケースを考える。
+
+\begin{enumerate}
+  \item 各大学のリソース（OS, CPU, Memory）の共有
+  \item 各大学における作業内容の確定・共有
+  \item それぞれの大学のサーバ管理者とのスケジューリングの調整
+  \item 各大学でのデプロイ作業
+  \item 各大学からの作業完了の連絡
+  \item 全大学での作業完了の共有
+\end{enumerate}
+
+上に列挙した作業はステージング環境の構築時の内容であるが、新たにノードを追加する際には1から、修正を当てたパッチを適応する
+アップデート作業が必要な場合は2から工程をその都度行う必要がある。
 
 \section{拡張性}
 \label{evaluation:method}
