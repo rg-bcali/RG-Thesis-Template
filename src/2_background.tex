@@ -136,6 +136,43 @@ Kubernetesでは，複数のKubernetes Nodeの管理やコンテナのローリ�
 さらに，Kubernetesではデプロイするコンテナとその周辺のリソースをYAML形式やJSON形式で記述した宣言的なコードによって管理することで，
 Infrastructure as Codeが実現可能としている．
 
+\subsection{Kubeadm}
+
+Kubeadm~\cite{Kubeadm}は、Kubenetesクラスタを構築するためのベストプラクティスを提供するツールである。
+Kubeadmが提供するコマンドをいくつか以下に示す。\\*
+
+{\bf kubeadm init}\\
+クラスタの最初のコントロールプレーンとなるノードを起動する。\\*
+
+{\bf kubeadm join}\\
+クラスタに追加のコントロールプレーンまたはワーカーノードを参加させる。\\*
+
+{\bf kubeadm upgrade}\\
+クラスタのバージョンを最新へアップグレードする。\\*
+
+{\bf kubeadm reset}\\
+kubeadm initやkubeadm joinによって生じた変更を取り消す。\\*
+
+\subsection{kubelet}
+
+kubelet~\cite{kubelet}は、
+
+\subsection{kubectl}
+
+kubectl~\cite{kubectl}は、Kubernetesクラスタをコントロールするためのツールである。
+新規コンテナのデプロイや削除、アップデートから、動作中のコンテナやクラスタを構成するノードの情報の取得など、サービスの
+運用を支援するAPIが提供されている。
+kubeletが提供するコマンドをいくつか以下に示す。\\*
+
+{\bf kubectl get nodes}\\
+クラスタに参加するノードのステータスやロール（役割）、IPアドレス等を取得する。\\*
+
+{\bf kubectl get pods}\\
+ポッドの名前やステータス、再起動の回数等を取得する。\\*
+
+{\bf kubectl apply}\\
+追記。\\*
+
 \section{OpenVPN}
 \label{background:openvpn}
 
