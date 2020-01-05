@@ -1,56 +1,71 @@
 \chapter{評価}
 \label{evaluation}
-本章では，提案システムの評価について述べる．
 
-\section{評価手法}
+本章では，本研究の提案が~\ref{issue:requirements}で述べた問題解決における要件を満たしているか評価を行う。
+
+\section{実際性}
 \label{evaluation:method}
 
-basafaネットワークに参加する28の大学すべてで，新バージョンのbitcoindを起動させるケースにおいて，従来の工程と本研究で
-提案したシステムを使用した場合の工程を比較する．
+実際性の評価をするため以下二点が実現されているか確認した。
 
-\section{評価内容}
-\label{evaluation:content}
+\begin{enumerate}
+  \item 異なるLAN内に配置されたサーバ同士がネットワーク上で疎通できているか
+  \item 複数の論理セグメントに跨ってKubernetesクラスタを構築できているか
+\end{enumerate}
 
-\subsection{従来の工程}
+一点目は、あるサーバから異なるサーバに対するpingコマンドを用いて疎通性を確認した。
+以下は、Worker01（192.168.20.102）からMaster01（192.168.10.101）に対してpingコマンドを使用した際の出力である。
 
-・28大学間でデプロイするbitcoindのソフトウェアとブランチを共有
-・それぞれの大学で使用するノードのOSを把握
-・OSに対応したデプロイの手順書を作成
-・大学（その１）へコンタクト
-    ・作業日程の調整
-・大学（その２）へコンタクト
-    ・作業日程の調整
-・大学（その３）へコンタクト
-    ・作業日程の調整
-...（省略）
-・大学（その２７）へコンタクト
-    ・作業日程の調整
-・大学（その１）でデプロイ作業
-・大学（その２）でデプロイ作業
-・大学（その３）でデプロイ作業
-...（省略）
-・大学（その２８）でデプロイ作業
-・大学（その１）へコンタクト
-    ・作業進捗の共有
-・大学（その２）へコンタクト
-    ・作業進捗の共有
-・大学（その３）へコンタクト
-    ・作業進捗の共有
-...（省略）
-・大学（その２７）へコンタクト
-    ・作業進捗の共有
-・すべての作業で作業が完了したことを確認
-```
-```
-・完了報告
+\begin{lstlisting}[language=bash]
+  $ ping 192.168.10.101
+  PING 192.168.10.101 (192.168.10.101) 56(84) bytes of data.
+  64 bytes from 192.168.10.101: icmp_seq=1 ttl=63 time=1.13 ms
+  64 bytes from 192.168.10.101: icmp_seq=2 ttl=63 time=1.50 ms
+  64 bytes from 192.168.10.101: icmp_seq=3 ttl=63 time=1.33 ms
+  64 bytes from 192.168.10.101: icmp_seq=4 ttl=63 time=1.03 ms
+  64 bytes from 192.168.10.101: icmp_seq=5 ttl=63 time=1.58 ms
 
-\subsection{本研究で提案したシステムでの工程}
+  --- 192.168.10.101 ping statistics ---
+  5 packets transmitted, 5 received, 0% packet loss, time 4006ms
+  rtt min/avg/max/mdev = 1.037/1.319/1.584/0.211 ms
+\end{lstlisting}
 
-・Kubernetesのマニフェストファイルを更新する
-・以下のコマンドでKubernetesクラスタへのコンテナのデプロイを行う
-`kubectl`
-・以下のコマンドで対象のコンテナが起動することを確認する
-`kubectl get pods -o wide`
+二点目は、kubectlコマンドにてクラスタを構成するノードのIPアドレスを確認し、それらが別々のセグメントに位置することを確認した。\\*
+
+\begin{lstlisting}[language=bash]
+  $ kubectl get nodes -owide
+  NAME       STATUS   ROLES    AGE   VERSION   INTERNAL-IP      EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION      CONTAINER-RUNTIME
+  master01   Ready    master   48d   v1.16.3   192.168.10.101   <none>        Ubuntu 18.04.3 LTS   4.15.0-70-generic   docker://18.9.7
+  master02   Ready    master   48d   v1.16.3   192.168.10.102   <none>        Ubuntu 18.04.3 LTS   4.15.0-70-generic   docker://18.9.7
+  master03   Ready    master   48d   v1.16.3   192.168.10.103   <none>        Ubuntu 18.04.3 LTS   4.15.0-70-generic   docker://18.9.7
+  worker01   Ready
+  worker02   Ready
+  worker03   Ready
+  worker04   Ready
+\end{lstlisting}
+
+以上の結果より、論理的に隔離されたLANに跨ってKubernetesクラスタが構築可能であることを示した。
+よって、地理的に分散したシステムのためのステージング環境を実際のインターネット上に構築することが可能であることが言える。
+
+\section{統合性}
+\label{evaluation:method}
+
+以下二点を明らかにすることで、統合性の評価を行う。
+
+\begin{enumerate}
+  \item 特定のノードからステージング環境に属する全てのノードに対して一斉に指示を送ることができるか
+  \item 本研究での提案手法を用いず従来の手作業を含む手法を選んだ場合、工数にどのような差が生じるか
+\end{enumerate}
+
+\section{拡張性}
+\label{evaluation:method}
+
+拡張性の評価において、以下二点におけるコストと必要時間を計測した。
+
+\begin{enumerate}
+  \item ステージング環境へのノードの追加
+  \item ステージング環境へのアプリケーションの追加
+\end{enumerate}
 
 %%% Local Variables:
 %%% mode: japanese-latex
