@@ -9,47 +9,88 @@
 
 \subsection{ハードウェアおよびソフトウェア}
 \label{implementation:environment:resouces}
+
 本研究で使用したハードウェアおよびソフトウェアとそのバージョンを以下に示す．
 
 \begin{table}[htb]
   \begin{center}
     \caption{使用したハードウェアおよびソフトウェア}
     \begin{tabular}{|l|l|} \hline
-      ハードウェア/ソフトウェア & バージョン \\ \hline
-      ESXi & 6.5 \\ \hline
+      ハードウェア/ソフトウェア & 機種/バージョン \\ \hline
+      Server & FUJITSU PRIMERGY S6 \\ \hline
+      VMWare ESXi & 6.5 \\ \hline
       VyOS & 1.2.1 \\ \hline
-      OpenVPN & ?? \\ \hline
-      Fujitsu Server & 2600ほげ \\ \hline
-      kubeadm & 1.16.4 \\ \hline
-      kubelet & 1.16.4 \\ \hline
-      kubectl & 1.16.4 \\ \hline
+      OpenVPN & 2.3.4 \\ \hline
+      Ubuntu & 18.04 \\ \hline
+      kubeadm & 1.16.3 \\ \hline
+      kubelet & 1.16.3 \\ \hline
+      kubectl & 1.16.3 \\ \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\subsection{物理サーバの準備}
+\label{implementation:esxi}
+
+本研究では、実装において複数のセグメントおよびKubernetesクラスタの構築に複数のサーバが必要であったため、それらを仮想的に作成できるVMWare ESXi（以下、ESXi）を導入した。
+使用したのは、ESXi6.5だ。
+ESXiはホストOSを必要とせず、直接ハードウェアにインストールさせて動作させるハイパーバイザー型であるため、まず初めにESXiインストーラの
+ブータブルイメージをUSBメモリに書き込み、FUJITSUサーバにインストールした。
+計二台のFUJITSUサーバにESXiをインストールし、それぞれ以下のIPアドレスを設定した。
+
+\begin{table}[htb]
+  \begin{center}
+    \caption{ESXiのIPアドレス}
+    \begin{tabular}{|l|l|} \hline
+      名前 & IPアドレス \\ \hline
+      1台目 & 10.4.0.13 \\ \hline
+      2台目 & 10.4.0.14 \\ \hline
     \end{tabular}
   \end{center}
 \end{table}
 
 \subsection{ネットワーク構成}
 \label{implementation:network-environment}
-本研究では，esxiの仮想スイッチと仮想Vlanを利用して二つのesxiサーバ上に論理的に隔離されたセグメントを構築した．
 
-まず，10.4.0.0/16のセグメントに二台のesxiサーバをマウントし，ひとつを10.4.0.13/16，もうひとつを10.4.0.14/16とした．（← eth0等の説明をいれる）
-次に，10.4.0.13/16のesxiサーバ内でVLan10を紐づけた192.168.10.0/24のセグメントを用意した．10.4.10.14/16のesxiサーバでは，VLan20に紐づいた
-192.168.20.254とVlan30の192.168.30.0/24のセグメントを用意し，計三つの相互に通信不可能な隔離された論理セグメントを構築した．相互の通信が不可能
-なセグメント間でのKubernetesクラスタの構築はできないため，OpenVPNを用いてセグメント間での疎通を可能にする．eth0が10.4.0.90，eth1が192.168.10.1
-のアドレスを振り分けたVyosにOpenVPNサーバを構築した．異なるVLanセグメントに位置するノードには，OpenVPNで発行したクライアント鍵と設定ファイルを配布
-し，OpenVPNサーバへ接続することで，10.23.0.0/24セグメント上で疎通可能な環境を構築した．
+本節では、本研究で構築したネットワーク構成について説明する。
+
+まず初めに、ESXiの仮想スイッチとVLANを用いて二つのESXiサーバ上に新たに計三つの論理セグメントを構築した。
+Vlanによって論理的にセグメントを分割することで、お互いに通信不可能な環境とした。
+以下に、Vlan IDと対応するアドレスプレフィックスを示す。
+なお、元から存在する10.4.0.0/16のアドレスプレフィックスはVlan ID 0に対応している。
 
 \begin{table}[htb]
   \begin{center}
-    \caption{OpenVPN設定前の各サーバのIPアドレス}
+    \caption{Vlan IDと対応するアドレスプレフィックス}
     \begin{tabular}{|l|l|} \hline
-      名前 & IPアドレス \\ \hline
-      Master01 & 192.168.10.101 \\ \hline
-      Master02 & 192.168.10.102 \\ \hline
-      Master03 & 192.168.10.103 \\ \hline
-      Worker01 & 192.168.20.101 \\ \hline
-      Worker02 & 192.168.20.102 \\ \hline
-      Worker03 & 192.168.30.101 \\ \hline
-      Worker04 & 192.168.30.102 \\ \hline
+      Vlan ID & アドレスプレフィックス \\ \hline
+      0 & 10.4.0.0/16 \\ \hline
+      10 & 192.168.10.0/24 \\ \hline
+      20 & 192.168.20.0/24 \\ \hline
+      30 & 192.168.30.0/24 \\ \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\subsection{VMの準備}
+
+ネットワーク構築後、Kubernetesクラスタの構築に必要なサーバをVMとして立ち上げた。
+それぞれのVMのOSにはUbuntu18.04を採用した。
+以下に構築したサーバの詳細を示す。
+
+\begin{table}[htb]
+  \begin{center}
+    \caption{準備したVMの詳細}
+    \begin{tabular}{|l|l|l|l|} \hline
+      名前 & Vlan ID & IP & 役割 \\ \hline
+      lb & 10 & 192.168.10.253 & マスターノードのロードバランサー \\ \hline
+      master01 & 10 & 192.168.10.101 & マスターノード \\ \hline
+      master02 & 10 & 192.168.10.102 & マスターノード \\ \hline
+      master03 & 10 & 192.168.10.103 & マスターノード \\ \hline
+      node01 & 20 & 192.168.20.101 & ワーカーノード \\ \hline
+      node02 & 20 & 192.168.20.102 & ワーカーノード \\ \hline
+      node03 & 30 & 192.168.30.101 & ワーカーノード \\ \hline
+      node04 & 30 & 192.168.30.102 & ワーカーノード \\ \hline
     \end{tabular}
   \end{center}
 \end{table}
