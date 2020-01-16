@@ -14,7 +14,7 @@
 \end{enumerate}
 
 一点目は、あるサーバから異なるサーバに対するpingコマンドを用いて疎通性を確認した。
-以下は、Worker01（192.168.20.102）からMaster01（192.168.10.101）に対してpingコマンドを使用した際の出力である。
+以下は、node01（192.168.20.101）からmaster01（192.168.10.101）に対してpingコマンドを使用した際の出力である。
 
 \begin{lstlisting}[language=bash]
   $ ping 192.168.10.101
@@ -34,14 +34,14 @@
 
 \begin{lstlisting}[language=bash]
   $ kubectl get nodes -owide
-  NAME       STATUS   ROLES    AGE   VERSION   INTERNAL-IP      EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION      CONTAINER-RUNTIME
-  master01   Ready    master   48d   v1.16.3   192.168.10.101   <none>        Ubuntu 18.04.3 LTS   4.15.0-70-generic   docker://18.9.7
-  master02   Ready    master   48d   v1.16.3   192.168.10.102   <none>        Ubuntu 18.04.3 LTS   4.15.0-70-generic   docker://18.9.7
-  master03   Ready    master   48d   v1.16.3   192.168.10.103   <none>        Ubuntu 18.04.3 LTS   4.15.0-70-generic   docker://18.9.7
-  worker01   Ready
-  worker02   Ready
-  worker03   Ready
-  worker04   Ready
+  NAME       STATUS     ROLES    AGE     VERSION   INTERNAL-IP      EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION      CONTAINER-RUNTIME
+  master01   Ready      master   58d     v1.16.3   192.168.10.101   <none>        Ubuntu 18.04.3 LTS   4.15.0-70-generic   docker://18.9.7
+  master02   Ready      master   58d     v1.16.3   192.168.10.102   <none>        Ubuntu 18.04.3 LTS   4.15.0-70-generic   docker://18.9.7
+  master03   Ready      master   58d     v1.16.3   192.168.10.103   <none>        Ubuntu 18.04.3 LTS   4.15.0-70-generic   docker://18.9.7
+  node01     Ready      <none>   8d      v1.16.3   192.168.20.101   <none>        Ubuntu 18.04.3 LTS   4.15.0-74-generic   docker://18.9.7
+  node02     Ready      <none>   4d22h   v1.16.3   192.168.20.102   <none>        Ubuntu 18.04.3 LTS   4.15.0-74-generic   docker://18.9.7
+  node03     Ready      <none>   6d16h   v1.16.3   192.168.30.101   <none>        Ubuntu 18.04.3 LTS   4.15.0-74-generic   docker://18.9.7
+  node04     Ready      <none>   8d      v1.16.3   192.168.30.102   <none>        Ubuntu 18.04.3 LTS   4.15.0-74-generic   docker://18.9.7
 \end{lstlisting}
 
 以上の結果より、論理的に隔離されたLANに跨ってKubernetesクラスタが構築可能であることを示した。
@@ -62,12 +62,15 @@
 \begin{lstlisting}[language=bash]
   $ kubectl create deployment --image nginx hello-world
   $ kubectl get pods -owide
-  NAME                          READY   STATUS    RESTARTS   AGE    IP          NODE       NOMINATED NODE   READINESS GATES
-  hello-world-7c5756786-gx5hk   1/1     Running   0          3d6h   10.44.0.1   master02   <none>           <none>
+  NAME                          READY   STATUS    RESTARTS   AGE     IP          NODE       NOMINATED NODE   READINESS GATES
+  hello-world-c6c6778b4-5n74d   1/1     Running   0          4d22h   10.44.0.1   node01     <none>           <none>
+  hello-world-c6c6778b4-6mrj4   1/1     Running   0          4d22h   10.42.0.1   node03     <none>           <none>
+  hello-world-c6c6778b4-fmnxt   1/1     Running   0          4d22h   10.47.0.1   node02     <none>           <none>
+  hello-world-c6c6778b4-r8b5w   1/1     Running   0          4d22h   10.44.0.2   node04   <none>           <none>
 \end{lstlisting}
 
 二点目は、まず従来の手法を用いた場合の作業工程を列挙し、提案手法との違いを定性的に評価した。
-ここでは複数の大学によって構成される研究ネットワークにて、新たに開発した地理的に分散したシステムのためのステージング環境を構築・運用するケースを考える。
+ここでは複数の大学によって構成される研究ネットワークにて、新たに開発した地理的に分散したシステムをデプロイするケースを考える。
 
 \begin{enumerate}
   \item 各大学のリソース（OS, CPU, Memory）の共有
@@ -76,10 +79,13 @@
   \item 各大学でのデプロイ作業
   \item 各大学からの作業完了の連絡
   \item 全大学での作業完了の共有
+  \item ステージング環境の使用開始
 \end{enumerate}
 
-上に列挙した作業はステージング環境の構築時の内容であるが、新たにノードを追加する際には1から、修正を当てたパッチを適応する
-アップデート作業が必要な場合は2から工程をその都度行う必要がある。
+上に列挙したように本研究の提案手法を用いない場合、ステージング環境で何かしらの変更を行う度に開発者間での多くのコミュニケーションと手作業が生じる。
+すべての作業が単独で並行に行われれば、作業中のミスによる中断やコミュニケーション不足による手戻りが発生する可能性もある。
+対して本研究の提案手法では、ステージング環境が統合的に管理されており、一括ですべてのワーカーノードに対して処理を実行できる。
+例えば、パッチを当てた修正版のアプリケーションを新たにデプロイする場合、作業は一コマンドで完結し。すべての処理は自動化されているため冪等性が担保される。
 
 \section{拡張性}
 \label{evaluation:method}

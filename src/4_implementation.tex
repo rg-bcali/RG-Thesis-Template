@@ -5,6 +5,7 @@
 
 \section{実装環境}
 \label{implementation:environment}
+
 本節では，本研究で構築した実装環境について概説する．
 
 \subsection{ハードウェアおよびソフトウェア}
@@ -52,7 +53,7 @@ ESXiはホストOSを必要とせず、直接ハードウェアにインスト�
 \subsection{ネットワーク構成}
 \label{implementation:network-environment}
 
-本節では、本研究で構築したネットワーク構成について説明する。
+本研究で構築したネットワーク構成について説明する。
 
 まず初めに、ESXiの仮想スイッチとVLANを用いて二つのESXiサーバ上に新たに計三つの論理セグメントを構築した。
 Vlanによって論理的にセグメントを分割することで、お互いに通信不可能な環境とした。
@@ -178,6 +179,8 @@ client-serverモードを採用しなかった理由としては以下の二点�
     \end{tabular}
   \end{center}
 \end{table}
+
+\subsection{Kubernetesクラスタの構築}
 
 \section{システム全体}
 \label{implementation:system}
