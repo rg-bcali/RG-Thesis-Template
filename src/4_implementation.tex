@@ -26,6 +26,7 @@
       kubeadm & 1.16.3 \\ \hline
       kubelet & 1.16.3 \\ \hline
       kubectl & 1.16.3 \\ \hline
+      HA-Proxy & 1.8.8 \\ \hline
     \end{tabular}
   \end{center}
 \end{table}
@@ -182,16 +183,88 @@ client-serverモードを採用しなかった理由としては以下の二点�
 
 \subsection{Kubernetesクラスタの構築}
 
+OpenVPNによる拠点間の接続を行った後、Kubernetesクラスタを構築した。
+本研究の実装では、Kubeadmを使用した高可用性Kubernetesクラスタを構築するため、まず初めに複数マスターへのリクエストを振り分けるロードバランサーを設置した。
+ロードバランサーの構築には、HA-Proxy 1.8.8を採用した。\\
+
+\begin{lstlisting}
+  frontend kubernetes
+      bind *:6443
+      option tcplog
+      mode tcp
+      default_backend kubernetes-backend
+
+  frontend etcd
+      bind *:2379
+      option tcplog
+      mode tcp
+      default_backend etcd-backend
+
+  backend kubernetes-backend
+      mode tcp
+      balance roundrobin
+      option tcp-check
+      server master01 192.168.10.101:6443 check
+      server master02 192.168.10.102:6443 check
+      server master02 192.168.10.103:6443 check
+
+  backend etcd-backend
+      mode tcp
+      balance roundrobin
+      server master01  192.168.10.101:2379 check
+      server master02  192.168.10.102:2379 check
+      server master03  192.168.10.103:2379 check
+\end{lstlisting}
+
+上記の設定で、ロードバランサーのポート6443番とポート2379番へのリクエスを三台のマスターノードへと振り分けている。
+
+次に、マスターノードとワーカーノードを立ち上げるにあたり必要なパッケージをインストールした。
+Kuberntesのランタイムとして使用するDockerに加え、クラスタ構築時に用いるkubeadmとkubelet, クラスタ操作時に必要なkubectlをaptによって取得した。
+パッケージの用意が完了したのち、マスターノードからクラスタ構築作業を行った。
+kubeadmではクラスタの初期化用にinitコマンドが用意されており、初めのマスターノードにて実行することでクラスタの基盤を作成可能である。
+初期化に成功した場合、以下のようなテキストが出力される。\\
+
+\begin{lstlisting}
+  You can now join any number of control-plane nodes by copying certificate authorities
+  and service account keys on each node and then running the following as root:
+
+    kubeadm join 192.168.10.253:6443 --token { token } \
+      --discovery-token-ca-cert-hash sha256:{ hash }} \
+      --control-plane
+
+  Then you can join any number of worker nodes by running the following on each as root:
+
+  kubeadm join 192.168.10.253:6443 --token { token } \
+      --discovery-token-ca-cert-hash sha256:{ hash }}
+\end{lstlisting}
+
+出力にある通り、与えられたコマンドを他のマスターノードとワーカーノードから実行することでクラスタへの参加が行える。
+各サーバにて上記のコマンドを実行した結果、マスターノードからクラスタが構築できていることを確認できた。
+
+\begin{lstlisting}
+  $ kubectl get nodes
+  NAME       STATUS     ROLES    AGE     VERSION
+  master01   Ready      master   58d     v1.16.3
+  master02   Ready      master   58d     v1.16.3
+  master03   Ready      master   58d     v1.16.3
+  node01     Ready      <none>   8d      v1.16.3
+  node02     Ready      <none>   4d22h   v1.16.3
+  node03     Ready      <none>   6d16h   v1.16.3
+  node04     Ready      <none>   8d      v1.16.3
+\end{lstlisting}
+
 \section{システム全体}
 \label{implementation:system}
 本研究で構築した実装環境の図を以下に示す．
 
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=\textwidth]{./figures/network-diagram.jpg}
-    \caption{ネットワーク構成図}
-  \end{center}
-\end{figure}
+\begin{landscape}
+  \begin{figure}[htbp]
+    \begin{center}
+      \includegraphics[width=\textwidth]{./figures/network-diagram.jpg}
+      \caption{ネットワーク構成図}
+    \end{center}
+  \end{figure}
+\end{landscape}
 
 %%% Local Variables:
 %%% mode: japanese-latex
