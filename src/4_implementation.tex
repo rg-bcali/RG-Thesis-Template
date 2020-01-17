@@ -218,6 +218,13 @@ OpenVPNによる拠点間の接続を行った後，Kubernetesクラスタを構
 
 上記の設定で，ロードバランサーのポート6443番とポート2379番へのリクエスを三台のマスターノードへと振り分けている．
 
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=0.4\textwidth]{./figures/haproxy.jpg}
+    \caption{マスターノードとワーカーノードの関係性}
+  \end{center}
+\end{figure}
+
 次に，マスターノードとワーカーノードを立ち上げるにあたり必要なパッケージをインストールした．
 Kuberntesのランタイムとして使用するDockerに加え，クラスタ構築時に用いるkubeadmとkubelet, クラスタ操作時に必要なkubectlをaptによって取得した．
 パッケージの用意が完了したのち，マスターノードからクラスタ構築作業を行った．
