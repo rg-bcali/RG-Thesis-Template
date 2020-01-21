@@ -4,11 +4,13 @@
 本章では本研究の背景と関連する技術について概説する．
 
 \section{惑星規模の分散システム}
+\label{bg:definition}
 
 本節では、本研究が対象とする惑星規模の分散システムの定義を明らかにする。
 定義を分かりやすくするため、先にモノリスと分散システムについて概説し、違いを明らかにした上で惑星規模の分散システムを定義する。
 
 \subsection{モノリス}
+\label{bg:definition:monolith}
 
 モノリスとは、モノシリックなシステムを指す。
 モノリスは英語で一枚岩を意味し、システムにおいては、大きな単一のプログラムによって特定の処理を実行するアーキテクチャといえる。
@@ -17,6 +19,7 @@
 しかし、システムが大きくなるにつれて機能同士の依存関係が密な状態になることで細かい粒度でテストを行えなかったり、チーム開発における並行作業が困難になる傾向にある。
 
 \subsection{分散システム}
+\label{bg:definition:distributed-system}
 
 分散システムとは、マイクロサービスアーキテクチャなシステムを指す。
 システム全体が複数の独立したコンポーネントを組み合わせて成り立っている点において、モノリスとは対照的である。
@@ -28,8 +31,20 @@ Kubernetesに関する説明は~\ref{background:container-orchestration-system:k
 チーム開発において開発者同士で同じ箇所を担当する可能性も下がるため、開発スピードが向上するというメリットもある。
 
 \subsection{惑星規模の分散システム}
+\label{bg:definition:planetary-scale-distributed-system}
 
-\section{P2P}
+本研究で対象とする惑星規模の分散システムとは、~\ref{definition:distributed-system}の中でも世界中に地理的に分散したコンピュータが協調動作することによって成り立つシステムを指す。
+近年注目を集めているブロックチェーンや2000年代初頭に登場したWinnyといったサービスが、惑星規模の分散システムにあたる。
+これらのシステムに使用されている技術や、サービスについての概説は~\ref{bg:planetary-scale-distributed-system}にて行う。
+惑星規模の分散システムは、システムを構成するコンピュータの場所を開発者が固定できないことと、システム全体がスケーリングしていく点で~ref{bg:definition:distributed-system}章の分散システムとは異なる。
+開発者は、コンピュータの位置やスケーリングした際の挙動を考慮した上で開発を行わなければならない。
+よって、システムの挙動を左右する条件が~\ref{bg:definition:monolith}章のモノリスや~\ref{bg:definition:distributed-system}章の分散システムに比べて多くテストが難しい。
+
+\section{惑星規模の分散システムにおける使用技術と参考例}
+\label{bg:planetary-scale-distributed-system}
+
+\subsection{P2P}
+\label{bg:planetary-scale-distributed-system:p2p}
 
 P2Pとは``Peer to Peer''の略である．P2Pではコンピュータ同士が対等な関係を築いており，
 サーバ・クライアント方式で中央集権的な役割を担うサーバを必要とせずに成り立っている主従関係のないシステムモデルである．
