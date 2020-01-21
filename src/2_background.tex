@@ -12,14 +12,20 @@
 
 モノリスとは、モノシリックなシステムを指す。
 モノリスは英語で一枚岩を意味し、システムにおいては、大きな単一のプログラムによって特定の処理を実行するアーキテクチャといえる。
-このように、本来では大量のコードによって成り立っている意味を含むが、比較化のため本研究では、プログラムの大きさに関わらず単一のコンポーネントで構成されたシステムをモノリスと呼ぶことにした。
-例としては、特定のURLに対して固定の静的ページを返すWebサーバーや、システムのすべての処理を担うAPIサーバなどが挙げられる。
+このように、本来では大量のコードによって成り立つという意味を含むが、比較化のため本研究では、プログラムの大きさに関わらず単一のコンポーネントで構成されたシステムをモノリスと呼ぶことにした。
 単一のコンポーネントで構成されるシステムはアーキテクチャがシンプルなため、システム自体が小さい場合は取り扱いやすい。
-しかし、システムが大きくなるにつれて機能同士の依存関係が密な状態になることで細かい粒度のテストを行えなかったり、チーム開発が困難になる傾向にある。
+しかし、システムが大きくなるにつれて機能同士の依存関係が密な状態になることで細かい粒度でテストを行えなかったり、チーム開発における並行作業が困難になる傾向にある。
 
 \subsection{分散システム}
 
-
+分散システムとは、マイクロサービスアーキテクチャなシステムを指す。
+システム全体が複数の独立したコンポーネントを組み合わせて成り立っている点において、モノリスとは対照的である。
+各コンポーネントは異なる役割を持っており、お互いに協調動作することによってシステム全体が動作する。
+本研究で使用するKubernetesも、コンテナオーケストレーションに必要な機能をコンポーネント毎に分割した分散システムである。
+Kubernetesに関する説明は~\ref{background:container-orchestration-system:kubernetes}章で詳しく行う。
+分散システムは複雑で取り扱いづらいように思われるが、実際には機能が細分化され各コンポーネントの役割が明確になる。
+機能同士の依存関係が希薄になるため細かい粒度でのテストが可能となり、障害時の原因特定も容易になる。
+チーム開発において開発者同士で同じ箇所を担当する可能性も下がるため、開発スピードが向上するというメリットもある。
 
 \subsection{惑星規模の分散システム}
 
@@ -145,6 +151,7 @@ Bitcoinは基盤技術のひとつとしてWinnyやGnutellaと共通するP2Pネ
 それを満たした際に地理的に分散したシステムの十分なステージング環境が成り立つと考えられる．
 
 \section{コンテナオーケストレーションシステム}
+\label{background:container-orchestration-system}
 
 コンテナオーケストレーションシステムは、コンテナ型仮想環境を統合管理するためのプラットフォームおよびツールを指す。
 2010年代半ばから脚光を浴びるようになり、今では世界的に数々のプロジェクトで本番環境に適用されている。
@@ -155,6 +162,7 @@ Bitcoinは基盤技術のひとつとしてWinnyやGnutellaと共通するP2Pネ
 本節では、コンテナおよびコンテナオーケストレーションの概説と実際に使用したKubernetesやDockerといったツールについて紹介する。
 
 \subsection{コンテナ}
+\label{background:container-orchestration-system:container}
 
 本節では、コンテナおよびDockerについて概説する。
 
@@ -182,7 +190,7 @@ VMの後に登場した技術がコンテナ型仮想化である。
 本研究では,CRIのデファクトスタンダードであるDockerを採用している。
 
 \subsubsection{Docker}
-\label{background:docker}
+\label{background:container-orchestration-system:container:docker}
 
 Docker~\cite{Docker}はコンテナ型仮想環境を実現するためのプラットフォームおよびツールである．
 前述したようにDockerでは、宣言的なファイルから生成したコンテナイメージを元にコンテナを起動する。
@@ -192,7 +200,7 @@ Dockerファイルでは、ベースとなるイメージをインポートし�
 Dockerイメージをバージョン毎に管理するためのDocker Hubというサービスがあり、開発者は自身のレポジトリにイメージをプッシュしたり、他のレポジトリからイメージを取得することも可能である。
 
 \subsection{Kubernetes}
-\label{background:kubernetes}
+\label{background:container-orchestration-system:kubernetes}
 
 Kubernetes~\cite{Kubernetes}はコンテナオーケストレーションエンジンであり，コンテナ化されたアプリケーションのデプロイやスケーリングなどの管理を自動化するためのプラットフォームである．
 
@@ -223,6 +231,7 @@ kubeletを含め、本研究の実装で用いたkubeadm,kubectlに関しては�
 
 
 \subsubsection{Kubeadm}
+\label{background:container-orchestration-system:kubernetes:kubeadm}
 
 Kubeadm~\cite{Kubeadm}は，Kubenetesクラスタを構築するためのベストプラクティスを提供するツールである．
 Kubeadmが提供するコマンドをいくつか以下に示す．\\*
@@ -240,10 +249,12 @@ Kubeadmが提供するコマンドをいくつか以下に示す．\\*
 kubeadm initやkubeadm joinによって生じた変更を取り消す．\\*
 
 \subsubsection{kubelet}
+\label{background:container-orchestration-system:kubernetes:kubelet}
 
 kubelet~\cite{kubelet}は，
 
 \subsubsection{kubectl}
+\label{background:container-orchestration-system:kubernetes:kubectl}
 
 kubectl~\cite{kubectl}は，Kubernetesクラスタをコントロールするためのツールである．
 新規コンテナのデプロイや削除，アップデートから，動作中のコンテナやクラスタを構成するノードの情報の取得など，サービスの
