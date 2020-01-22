@@ -291,7 +291,12 @@ kubeadm initやkubeadm joinによって生じた変更を取り消す．\\*
 \subsubsection{kubelet}
 \label{background:container-orchestration-system:kubernetes:kubelet}
 
-kubelet~\cite{kubelet}は，
+kubelet~\cite{kubelet}は，Kubernetesクラスタ内の各ワーカーノードで動作するコンポーネントである。
+kubectlは、DockerなどのCRIと連携して実際にコンテナを起動・停止する役割をもつ。
+具体的にはetcdの情報を監視して、自身のノードに割り当てられてまだ起動していないコンテナがあれば起動する。
+etcdに格納された情報は、kube-apiserverやkube-controller-managerによってkube-apiserverを通して書き換えられ、実際のコンテナの操作に関してはkubeletが担うといった役割分担がされている。
+~\ref{background:container-orchestration-system:kubernetes:kubeadm}章のkubeadm、ならびに~\ref{background:container-orchestration-system:kubernetes:kubectl}章のkubectlは、Kubernetesクラスタ構築時や操作時に用いるコマンドツールであるのに対して、
+kubeletはコンテナの管理を行うデーモンとして動作する。
 
 \subsubsection{kubectl}
 \label{background:container-orchestration-system:kubernetes:kubectl}
