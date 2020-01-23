@@ -22,6 +22,13 @@
 単一のコンポーネントで構成されるシステムはアーキテクチャがシンプルなため，システム自体が小さい場合は取り扱いやすい．
 しかし，システムが大きくなるにつれて機能同士の依存関係が密な状態になることで細かい粒度でテストを行えなかったり，チーム開発における並行作業が困難になる傾向にある．
 
+\begin{figure}[htbp]
+\begin{center}
+    \includegraphics[width=0.4\textwidth]{./figures/monolith.jpg}
+    \caption{モノリス}
+\end{center}
+\end{figure}
+
 \subsection{分散システム}
 \label{bg:definition:distributed-system}
 
@@ -33,6 +40,13 @@ Kubernetesに関する説明は~\ref{background:container-orchestration-system:k
 分散システムは複雑で取り扱いづらいように思われるが，実際には機能が細分化され各コンポーネントの役割が明確になる．
 機能同士の依存関係が希薄になるため細かい粒度でのテストが可能となり，障害時の原因特定も容易になる．
 チーム開発において開発者同士で同じ箇所を担当する可能性も下がるため，開発スピードが向上するというメリットもある．
+
+\begin{figure}[htbp]
+\begin{center}
+    \includegraphics[width=0.4\textwidth]{./figures/distributed-system.jpg}
+    \caption{分散システム}
+\end{center}
+\end{figure}
 
 \subsection{惑星規模の分散システム}
 \label{bg:definition:planetary-scale-distributed-system}
@@ -212,18 +226,56 @@ Bitcoinは基盤技術のひとつとしてWinnyやGnutellaと共通するP2Pネ
 コンテナは，挙動としてはVMと似ており，どちらも同じ課題を解決している．
 VMが登場する前，開発者はひとつのサーバ上で複数のアプリケーションを動作させることに頭を悩ませていた．
 何故なら，アプリケーションのうちのひとつがサーバのリソースを大幅に占有した場合，他のアプリケーションのパフォーマンスが低下してしまうからである．
+
+\begin{figure}[htbp]
+\begin{center}
+    \includegraphics[width=\textwidth]{./figures/resource-on-physical-server.jpg}
+    \caption{アプリケーションのひとつがリソースを大幅に占有した場合}
+\end{center}
+\end{figure}
+
 解決策のひとつとして，アプリケーション毎に別々のサーバ上で動作させるものがあったが，デメリットとして維持費が嵩むことと使用されない無駄なリソースが生まれてしまうことがあった．
+
+\begin{figure}[htbp]
+\begin{center}
+    \includegraphics[width=\textwidth]{./figures/only-on-physical-server.jpg}
+    \caption{ひとつの物理サーバでひとつのアプリケーションを動作させる解決策}
+\end{center}
+\end{figure}
+
 これを解決するために開発されたのがVMである．
 VMはソフトウェアによって仮想的に物理マシンを実現する技術であり，ひとつの物理マシンCPU上で複数のVMを動作させることが可能である．
 アプリケーションはそれぞれ独立しておりお互いに不可侵な関係性であるため，ひとつのアプリケーションがリソースを占有することはなく，よりリソースを効率的に使用できる．
 スケーラビリティにも長けており，開発者はいつでもアプリを追加・削除でき，ハードウェアコストの削減にも貢献している．
 しかし，VMは処理におけるオーバーヘッドが大きく起動時間が長いなどデメリットも存在する．
+
+\begin{figure}[htbp]
+\begin{center}
+    \includegraphics[width=0.8\textwidth]{./figures/resource-on-vm.jpg}
+    \caption{VMの相互独立性}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+    \includegraphics[width=0.6\textwidth]{./figures/vm-structure.jpg}
+    \caption{VMの構成}
+\end{center}
+\end{figure}
+
 VMの後に登場した技術がコンテナ型仮想化である．
 コンテナ型仮想化では，各アプリケーションはひとつのホストOSを共有するため，VMより軽量で起動時間も短い．
 コンテナはコンテナイメージから作成され，イメージは宣言的なファイルに基づいて生成される．
 これによって開発者はより簡単かつスピーディに開発を進めることが可能である．
 "Build Once, Run Anywhere"というコンセプトが掲げられており，一度生成されたイメージはどの環境でも動作し冪等性が担保される．
 一方，ホストOSを共有するためセキュリティ面では課題が見られる．
+
+\begin{figure}[htbp]
+\begin{center}
+    \includegraphics[width=0.6\textwidth]{./figures/docker-structure.jpg}
+    \caption{コンテナ型仮想化}
+\end{center}
+\end{figure}
 
 コンテナ仮想環境を構築するためのランタイムであるCRIには，dockershim（Docker）, containerd, cri-o, Frakti, rktlet（rkt）などが挙げられる．
 本研究では,CRIのデファクトスタンダードであるDockerを採用している．
@@ -238,10 +290,31 @@ Dockerファイルでは，ベースとなるイメージをインポートし�
 ミドルウェアや各種環境設定をコード化して管理することができ（Infrastructure as Code），別の環境で何度実行しても同じ結果が保証される.
 Dockerイメージをバージョン毎に管理するためのDocker Hubというサービスがあり，開発者は自身のレポジトリにイメージをプッシュしたり，他のレポジトリからイメージを取得することも可能である．
 
+\begin{figure}[htbp]
+\begin{center}
+    \includegraphics[width=0.4\textwidth]{./figures/docker-logo.png}
+    \caption{Dockerのロゴ}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+    \includegraphics[width=0.8\textwidth]{./figures/docker-process.jpg}
+    \caption{Dockerでのコンテナ作成手順}
+\end{center}
+\end{figure}
+
 \subsection{Kubernetes}
 \label{background:container-orchestration-system:kubernetes}
 
 Kubernetes~\cite{Kubernetes}はコンテナオーケストレーションエンジンであり，コンテナ化されたアプリケーションのデプロイやスケーリングなどの管理を自動化するためのプラットフォームである．
+
+\begin{figure}[htbp]
+\begin{center}
+    \includegraphics[width=0.4\textwidth]{./figures/kubernetes_logo.png}
+    \caption{Kubernetesのロゴ}
+\end{center}
+\end{figure}
 
 もともとGoogle社内で利用されていたコンテナクラスタマネージャの「Borg」を基盤にして作られたオープンソースソフトウェアであるため信頼性が高く，現時点でコンテナオーケストレーションシステムのデファクトスタンダードとなっている．
 Kubernetesでは，複数のKubernetes Nodeの管理やコンテナのローリングアップデート，オートスケーリング，死活監視，ログ管理などサービスを本番環境で動かす上で必要不可欠となる機能を備えている．
@@ -257,6 +330,13 @@ Kubernetesは，複数のサーバを束ねたクラスタの上で動作する�
 クラウド環境を用いた場合，クリックひとつでKubernetesクラスタを用意することができる．
 状況に応じてワーカーノードを追加・削除でき，自由にスケーリング出来る点も強みである．
 クラウドの種類によっては特定の条件に合わせて自動でノードのオートスケーリングを行うこともできるが，オンプレ環境では自前で実装する必要がある．
+
+\begin{figure}[htbp]
+\begin{center}
+    \includegraphics[width=\textwidth]{./figures/k8s-deploy-container.jpg}
+    \caption{Kubernetesでのコンテナデプロイ}
+\end{center}
+\end{figure}
 
 Kubernetes自体は，多数のコンポーネントによって構成されるマイクロサービスアーキテクチャを採用している．
 すべてのコンポーネントがkube-apiserverと呼ばれるKubernetes内のAPIサーバを中心として動作しており，殆ど全ての処理はkube-apiserverを通して実行される．
@@ -324,9 +404,23 @@ VPNを使用することで、インターネット上の異なるセグメン�
 VPNにはL2VPNとL3VPNがあり、L2VPNは異なるセグメント同士を接続しひとつの擬似的なLANを構築するものであり、L3VPNではIPプロトコルでの通信が可能となる。
 セキュリティ面においては、通信内容をカプセル化することでパケットの中身の覗き見や改竄のリスクを低減することができる。
 
+\begin{figure}[htbp]
+\begin{center}
+    \includegraphics[width=0.8\textwidth]{./figures/openvpn.jpg}
+    \caption{VPN}
+\end{center}
+\end{figure}
+
 \subsection{OpenVPN}
 
 OpenVPN~\cite{OpenVPN}は、OpenVPN Technologies, inc.が中心になって開発しているオープンソースのVPNソフトウェアである．
+
+\begin{figure}[htbp]
+\begin{center}
+    \includegraphics[width=0.4\textwidth]{./figures/openvpn-logo.png}
+    \caption{OpenVPNのロゴ}
+\end{center}
+\end{figure}
 
 OpenVPNは幅広いOSでサポートされており、Window, Linux, Mac OS, iOS, Androidで利用可能である。
 異なるOS間でも利用可能であるため、ひとつのVPNネットワーク内に異なるOSが混在していても正常に動作する。
