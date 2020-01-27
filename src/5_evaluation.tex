@@ -1,63 +1,57 @@
 \chapter{評価}
 \label{evaluation}
 
-本章では，本研究の提案が~\ref{issue:requirements}で述べた問題解決における要件を満たしているか評価を行う．
+本章では、本システムが~\ref{issue:requirements}章で述べた課題解決における必要要件を満たしているか確認することで本研究の提案の評価を行う。
+必要要件は以下の通りである。
+\begin{itemize}
+  \item OSやCPU， Memoryといったサーバ環境を柔軟に変更可能であること
+  \item 公の実稼働環境を想定したネットワークでの通信の遅延を考慮できること
+  \item 異なる管理権限下にある各サーバに対し統合的管理が可能であり，各オペレータの手作業を軽減できること
+  \item 地理的に分散した各サーバに対し，統合的な操作が可能であること
+\end{itemize}
+評価では、本システムが地理的に分散したサーバに対して適用可能か、ならびに本システムを利用することによる手作業の削減の二点における定性評価、
+加えてネットワーク上の遅延による本システムへの影響を定量的に評価した。
 
-\section{実際性}
-\label{evaluation:method}
+\section{地理的に分散したサーバに対する統合管理}
 
-実際性の評価をするため以下二点が実現されているか確認した．
-
-\begin{enumerate}
-  \item 異なるLAN内に配置されたサーバ同士がネットワーク上で疎通できているか
-  \item 複数の論理セグメントに跨ってKubernetesクラスタを構築できているか
-\end{enumerate}
-
-一点目は，あるサーバから異なるサーバに対するpingコマンドを用いて疎通性を確認した．
-以下は，node01（192.168.20.101）からmaster01（192.168.10.101）に対してpingコマンドを使用した際の出力である．
+本システムでは、互いに疎通の取れない別セグメントをOpenVPNオーバーレイネットワークで繋ぎ、その上でKubernetesクラスタを構築した。
+VPNによって異なるセグメントへの疎通性が確保されていることは、pingコマンドを用いて確認した。
+以下は、Kubernetesクラスタ内のマスターノード（192.168.10.101）から別セグメントに配置されたワーカーノードに対してpingコマンドを実行した際の結果である。
 
 \begin{lstlisting}[language=bash]
-  $ ping 192.168.10.101
-  PING 192.168.10.101 (192.168.10.101) 56(84) bytes of data.
-  64 bytes from 192.168.10.101: icmp_seq=1 ttl=63 time=1.13 ms
-  64 bytes from 192.168.10.101: icmp_seq=2 ttl=63 time=1.50 ms
-  64 bytes from 192.168.10.101: icmp_seq=3 ttl=63 time=1.33 ms
-  64 bytes from 192.168.10.101: icmp_seq=4 ttl=63 time=1.03 ms
-  64 bytes from 192.168.10.101: icmp_seq=5 ttl=63 time=1.58 ms
+  $ ping 192.168.20.101 -c5
+  PING 192.168.20.101 (192.168.20.101) 56(84) bytes of data.
+  64 bytes from 192.168.20.101: icmp_seq=1 ttl=62 time=1.41 ms
+  64 bytes from 192.168.20.101: icmp_seq=2 ttl=62 time=1.02 ms
+  64 bytes from 192.168.20.101: icmp_seq=3 ttl=62 time=1.28 ms
+  64 bytes from 192.168.20.101: icmp_seq=4 ttl=62 time=1.06 ms
+  64 bytes from 192.168.20.101: icmp_seq=5 ttl=62 time=1.43 ms
 
-  --- 192.168.10.101 ping statistics ---
-  5 packets transmitted， 5 received， 0% packet loss， time 4006ms
-  rtt min/avg/max/mdev = 1．037/1．319/1．584/0．211 ms
+  --- 192.168.20.101 ping statistics ---
+  5 packets transmitted, 5 received, 0% packet loss, time 4005ms
+  rtt min/avg/max/mdev = 1.028/1.243/1.432/0.172 ms
 \end{lstlisting}
 
-二点目は，kubectlコマンドにてクラスタを構成するノードのIPアドレスを確認し，それらが別々のセグメントに位置することを確認した．\\*
+パケットロスはなく、通信が行えていることが確認できた。
+
+次に、kubectlコマンドによって異なるセグメントに位置するサーバをクラスタリングできていることを確認した。
 
 \begin{lstlisting}[language=bash]
   $ kubectl get nodes -owide
-  NAME       STATUS     ROLES    AGE     VERSION   INTERNAL-IP      EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION      CONTAINER-RUNTIME
-  master01   Ready      master   58d     v1.16.3   192.168.10.101   <none>        Ubuntu 18.04.3 LTS   4.15.0-70-generic   docker://18.9.7
-  master02   Ready      master   58d     v1.16.3   192.168.10.102   <none>        Ubuntu 18.04.3 LTS   4.15.0-70-generic   docker://18.9.7
-  master03   Ready      master   58d     v1.16.3   192.168.10.103   <none>        Ubuntu 18.04.3 LTS   4.15.0-70-generic   docker://18.9.7
-  node01     Ready      <none>   8d      v1.16.3   192.168.20.101   <none>        Ubuntu 18.04.3 LTS   4.15.0-74-generic   docker://18.9.7
-  node02     Ready      <none>   4d22h   v1.16.3   192.168.20.102   <none>        Ubuntu 18.04.3 LTS   4.15.0-74-generic   docker://18.9.7
-  node03     Ready      <none>   6d16h   v1.16.3   192.168.30.101   <none>        Ubuntu 18.04.3 LTS   4.15.0-74-generic   docker://18.9.7
-  node04     Ready      <none>   8d      v1.16.3   192.168.30.102   <none>        Ubuntu 18.04.3 LTS   4.15.0-74-generic   docker://18.9.7
+  NAME       STATUS     ROLES    VERSION   INTERNAL-IP       OS-IMAGE             KERNEL-VERSION      CONTAINER-RUNTIME
+  master01   Ready      master   v1.16.3   192.168.10.101    Ubuntu 18.04.3 LTS   4.15.0-70-generic   docker://18.9.7
+  master02   Ready      master   v1.16.3   192.168.10.102    Ubuntu 18.04.3 LTS   4.15.0-70-generic   docker://18.9.7
+  master03   Ready      master   v1.16.3   192.168.10.103    Ubuntu 18.04.3 LTS   4.15.0-70-generic   docker://18.9.7
+  node01     Ready      <none>   v1.16.3   192.168.20.101    Ubuntu 18.04.3 LTS   4.15.0-74-generic   docker://18.9.7
+  node02     Ready      <none>   v1.16.3   192.168.20.102    Ubuntu 18.04.3 LTS   4.15.0-74-generic   docker://18.9.7
+  node03     Ready      <none>   v1.16.3   192.168.30.101    Ubuntu 18.04.3 LTS   4.15.0-74-generic   docker://18.9.7
+  node04     Ready      <none>   v1.16.3   192.168.30.102    Ubuntu 18.04.3 LTS   4.15.0-74-generic   docker://18.9.7
 \end{lstlisting}
 
-以上の結果より，論理的に隔離されたLANに跨ってKubernetesクラスタが構築可能であることを示した．
-よって，惑星規模の分散システムのためのステージング環境を実際のインターネット上に構築することが可能であることが言える．
+上記の結果から、異なるIPアドレスをもつサーバに対しクラスタリングを行えていることが確認できた。
 
-\section{統合性}
-\label{evaluation:method}
-
-以下二点を明らかにすることで，統合性の評価を行う．
-
-\begin{enumerate}
-  \item 特定のノードからステージング環境に属する全てのノードに対して一斉に指示を送ることができるか
-  \item 本研究の提案手法を用いず従来の手作業を含む手法を選んだ場合，工数にどのような差が生じるか
-\end{enumerate}
-
-一点目は，kubectlコマンドを用いてステージング環境のワーカーノードに対して同時にアプリケーションをデプロイすることができたかを確認した．\\*
+最後に、Kubernetesクラスタ上にアプリケーションのデプロイが可能であるかを確認した。
+NginxをKubernetesのワークロードであるDeploymentとしてクラスタ上にデプロイした結果が以下である。
 
 \begin{lstlisting}[language=bash]
   $ kubectl create deployment --image nginx hello-world
@@ -69,45 +63,40 @@
   hello-world-c6c6778b4-r8b5w   1/1     Running   0          4d22h   10.44.0.2   node04   <none>           <none>
 \end{lstlisting}
 
-二点目は，まず従来の手法を用いた場合の作業工程を列挙し，提案手法との違いを定性的に評価した．
-ここでは複数の大学によって構成される研究ネットワークにて，新たに開発した惑星規模の分散システムをデプロイするケースを考える．
+node01からnode04のすべてのワーカーノードに対してコンテナのデプロイが完了したことを確認できた。
+これにより、異なるセグメントに位置するノードに対して統合管理が可能であることを確認した。
+
+\section{オペレータの手作業の軽減}
+
+本節では、本システムが異なる組織間での惑星規模の分散システムの試験においてオペレータの手作業を軽減可能であるか評価する。
+複数の大学によって構成される研究ネットワークで、惑星規模の分散システムを試験する場合を考える。
+試験の実行にあたって必要な作業が必要であると考える。
 
 \begin{enumerate}
   \item 各大学のリソース（OS， CPU， Memory）の共有
   \item 各大学における作業内容の確定・共有
-  \item それぞれの大学のサーバ管理者とのスケジューリングの調整
+  \item 各大学のサーバ管理者とのスケジューリングの調整
   \item 各大学でのデプロイ作業
-  \item 各大学からの作業完了の連絡
+  \item 各大学から作業完了の連絡が来るのを待機
   \item 全大学での作業完了の共有
-  \item ステージング環境の使用開始
+  \item 試験環境の利用開始
 \end{enumerate}
 
-上に列挙したように本研究の提案手法を用いない場合，ステージング環境で何かしらの変更を行う度に開発者間での多くのコミュニケーションと手作業が生じる．
-すべての作業が単独で並行に行われれば，作業中のミスによる中断やコミュニケーション不足による手戻りが発生する可能性もある．
-対して本研究の提案手法では，ステージング環境が統合的に管理されており，一括ですべてのワーカーノードに対して処理を実行できる．
-例えば，パッチを当てた修正版のアプリケーションを新たにデプロイする場合，作業は一コマンドで完結し．すべての処理は自動化されているため冪等性が担保される．
+異なる管理権限下にあるサーバに対し操作を行う場合、上記の作業が必要である。
+なお、これらの作業は試験環境での変更の際に発生する。
+デプロイ作業、アップデート作業など試験環境の設定を変更する度に、各オペレータの手作業が必要となる。
+対して本研究の提案手法では，試験環境が統合的に管理されており、オペレータはマスターノードを介して一斉にすべてのサーバへ指示を送ることが可能である。
+各オペレータの手作業を軽減が可能であり、統合管理することにより作業の冪等性を担保することができる。
 
-\section{拡張性}
-\label{evaluation:method}
+\section{通信の遅延による本システムへの影響}
 
-拡張性の評価において，新規ノード追加時の必要時間を計測した．
-計測では，必要なパッケージのインストールに掛かる時間とクラスタへの参加時間の二つを対象とした．
-パッケージのインストールはAnsibleを用いて自動化し，apt updateからdocker， kubeadm等のインストール，リブートまでを含んでいる．
-クラスタへの参加時間は，kubeadm joinに要した時間と，マスターノードでノードの参加を確認しステータスがReadyになるまでの時間を加算したものである．
+定量的評価。
+別拠点との通信におけるネットワーク上の遅延が100ms、200ms、300msの場合に本システムが正常に動作するか、
+ならびにすべてのノードへコンテナをデプロイするまでに掛かった時間をそれぞれ計測した。
 
-\begin{table}[htb]
-  \begin{center}
-    \caption{新規ノード追加時の必要時間}
-    \begin{tabular}{|l|l|} \hline
-      内容 & 経過時間 \\ \hline
-      パッケージのインストール & 509．50s \\ \hline
-      クラスタへの参加 & 105．86s \\ \hline
-    \end{tabular}
-  \end{center}
-\end{table}
+\section{評価のまとめ}
 
-以上の結果から，新規ノードの追加に要する時間はパッケージのインストールからクラスタへの追加まで10分程度で行えることが確認できた．
-短い時間でステージング環境のスケーリングを行えたことを持って，拡張性を担保できていると考えた．
+まとめ。
 
 %%% Local Variables:
 %%% mode: japanese-latex
