@@ -10,32 +10,32 @@ Abstract of Bachelor's Thesis - Academic Year 2019
 \end{center}
 
 ~ \\
-In this study, we propose the implementation method for a test environment of a planetary-scale distributed system.
-The planetary-scale distributed system in this study is the distributed system consisted of geographically distributed computers.
-P2P is one of the generic technologies for planetary-scale distributed systems.
-P2P system does not require a centralized server and is run by computers that have an equal relationship with each other and cooperate.
+In this study, we propose a system design for a experiment environment of a planetary-scale distributed system.
+The planetary-scale distributed system in this study is a distributed system consisted of geographically distributed computers.
+P2P is one of the technologies for planetary-scale distributed systems.
+P2P system does not require a centralized server and is run by computers that have an equal relationship with each other to cooperate.
 Blockchain is one of the P2P systems.
-The test for planetary-scale distributed systems should consider network latency.
-Therefore, the test environment for planetary-scale distributed systems should consist of geographically distributed servers.
+The experiment for planetary-scale distributed systems should consider network latency.
+Therefore, the experiment environment for planetary-scale distributed systems should consist of geographically distributed servers.
 
-There are the PlanetLab and the cloud services, the BSafe.network as the test environment for planetary-scale distributed systems, but these have problems.
+There are the PlanetLab and the cloud services, the BSafe.network as the experiment environment for planetary-scale distributed systems, but these have problems.
 PlanetLab is a research network that supports the development of network services.
 It has 1353 servers that are able to be controlled via ssh in 717 areas around the world but can not flexibly change an environment of the server such as OS, CPU, and memory.
 In a cloud service, servers can be geographically distributed by specifying an area of a data center called region.
 However, regions are limited and the delay in network communication is less than the public production environment.
 BSafe.network is the network for researching the blockchain technology that consists of 32 universities around the world.
 In the BSafe.network, developers can research using servers owned by each university.
-However, the manual work of each operator is needed for the joint research between universities, because the management authority of each server is divided.
-To solve these problems, we propose the implementation method for the integrated test environment by combining OpenVPN and Kubernetes.
-In this system, it is possible to test with the delay in network communication, regardless of where the servers are geographically distributed.
+However, the manual operation of each operator is needed for the joint research between universities, because the management authority of each server is divided.
+To solve these problems, we propose the system design for the integrated experiment environment by combining OpenVPN and Kubernetes.
+In this system, it is possible to run experiments with the delay in network communication, regardless of where the servers are geographically distributed.
 In addition, multiple applications can be run on a single server in various environments by utilizing virtualization technology, and
 can integrate even when each server is under separate management.
 
 We verified whether integrated management of all servers is possible and whether this system operates normally considering the delay in communication.
 
-This research makes it possible to test planetary-scale distributed systems more flexibly in a similar manner to a public production environment.
+This research makes it possible to run experiments for planetary-scale distributed systems more flexibly in a similar manner to a public production environment.
 Even if each server is under separate management such as BSafe.network,
-It is possible to implement an integrated test environment without any manual works.
+It is possible to implement an integrated experiment environment without any manual works.
 
 ~ \\
 Keywords : \\
