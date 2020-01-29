@@ -11,24 +11,24 @@ Abstract of Bachelor's Thesis - Academic Year 2019
 
 ~ \\
 In this study, we propose a system design for an experiment environment of a planetary-scale distributed system.
-The planetary-scale distributed system in this study is a distributed system consisted of geographically distributed computers.
-P2P is one of a technologies for planetary-scale distributed systems.
+The planetary-scale distributed system in this study is a distributed system consist of geographically distributed computers.
+P2P is one of the example of planetary-scale distributed systems.
 P2P system does not require a centralized server and is run by computers that have an equal relationship with each other to cooperate.
 Blockchain is one of such P2P systems.
 Experiments for planetary-scale distributed systems should consider network latency.
 Therefore, experiment environments for planetary-scale distributed systems should consist of geographically distributed servers.
 
-There are several services such as PlanetLab, public cloud services, and BSafe.network can be used as an experiment environment for planetary-scale distributed systems, but these have problems.
-PlanetLab is a research network that supports a development of network services.
-It has 1353 servers that are able to be controlled via secure shell in 717 areas around the world but can not flexibly change the environments of the servers such as OS, CPU, and memory.
+There are several services such as PlanetLab, public cloud services, and BSafe.network can be used as an experiment environment for planetary-scale distributed systems, but all of them have shortcomings.
+PlanetLab is a research network that supports an experiment of network services.
+It has 1353 servers that are able to be controlled via secure shell in 717 areas around the world, but can not flexibly change the environments of the servers such as OS, CPU, and memory.
 In a public cloud service, servers can be geographically distributed by specifying one area called region.
 However, regions are limited and network performance is high around a data center of a public cloud service and the delay in network communication is less than the servers in the proximity of the region.
-BSafe.network is a network for researching blockchain technology that consists of 32 universities around the world.
-In BSafe.network, developers can research using servers owned by each university.
-However, the manual operations of the operators are needed for the joint research between universities, because the management authority of the each server is different.
-To solve these problems, we propose a system design for an integrated experiment environment by combining two softwares: OpenVPN and Kubernetes.
-In this system, it is possible to run experiments with the delay in the network communication, regardless of where the servers are geographically distributed.
-Besides, several applications can be run on a single server with various environments by using virtualization technology, and
+BSafe.network is a network for researching blockchain technology that consists of thirty-two universities around the world.
+In BSafe.network, developers can experiment using servers owned by each university.
+However, the manual operations are needed for the joint research between universities, because the management authority of the each server is different.
+To solve these issues, we propose a system design for an integrated experiment environment by combining two softwares: OpenVPN and Kubernetes.
+In this system, it is possible to run experiments even with control delay, regardless of where the servers are geographically distributed.
+Besides, several applications can be run on a single server by using virtualization technology, and
 can be integrated even if each server is under separate management.
 
 We verified whether integrated management of the servers is possible, and whether this system operates normally considering the delay in communication.
